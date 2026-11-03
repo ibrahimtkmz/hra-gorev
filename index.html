@@ -1,0 +1,2369 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tıklama App</title>
+  <style>
+    :root {
+      --accent: #F27A1A;
+      --accent-dark: #d46610;
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --danger: #dc2626;
+      --ok: #16a34a;
+      --radius: 20px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 16px;
+      background:
+        radial-gradient(ellipse at top, #ffe8d4 0%, transparent 55%),
+        var(--bg);
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 22px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #ff9a4a);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(242,122,26,0.35);
+    }
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand-text p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #374151;
+    }
+    .field { margin-bottom: 16px; }
+    input[type="text"], input[type="tel"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #fafafa;
+    }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(242,122,26,0.15);
+      background: #fff;
+    }
+    input.invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.12);
+    }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .error-msg {
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 6px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px 18px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s, opacity 0.15s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(242,122,26,0.35);
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-dark); }
+    .btn-link {
+      background: linear-gradient(135deg, var(--accent), #ff9a4a);
+      color: #fff;
+      font-size: 17px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(242,122,26,0.4);
+      margin: 18px 0 14px;
+    }
+    .btn-secondary {
+      background: #111827;
+      color: #fff;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px;
+    }
+    .btn-restart-step {
+      margin-top: 18px;
+      font-size: 13px;
+      padding: 8px;
+      opacity: 0.85;
+    }
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff4eb;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .step-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+    .step-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 4px;
+    }
+    .timer-wrap {
+      margin-top: 8px;
+      margin-bottom: 4px;
+      display: none;
+    }
+    .timer-wrap.visible { display: block; }
+    .away-warn { display: none; margin-top: 10px; border-radius: 14px; padding: 12px 14px; background: #fff7ed; border: 1px solid #fed7aa; color: #9a4a07; font-size: 14px; font-weight: 600; line-height: 1.45; }
+    .away-warn.show { display: block; }
+    .timer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .timer-top strong {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      font-size: 15px;
+    }
+    .progress {
+      height: 10px;
+      background: #f3f4f6;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent), #ffb06a);
+      border-radius: 999px;
+      transition: width 0.2s linear;
+    }
+    .progress-bar.warn {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+    .progress-bar.danger {
+      background: linear-gradient(90deg, #dc2626, #f87171);
+    }
+    .dots {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e5e7eb;
+    }
+    .dot.done { background: var(--ok); }
+    .dot.current { background: var(--accent); transform: scale(1.25); }
+    .dot.missed { background: #fca5a5; }
+    .thank-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #dcfce7;
+      color: var(--ok);
+      display: grid;
+      place-items: center;
+      font-size: 36px;
+      margin: 8px auto 18px;
+    }
+    .thank-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .thank-desc {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(17,24,39,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      position: relative;
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px 22px 22px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      animation: popIn 0.22s ease;
+    }
+    .modal-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border: none;
+      border-radius: 12px;
+      background: #f3f4f6;
+      color: #374151;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      display: none; /* only shown when click was not recorded */
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .modal-close.show { display: inline-flex; }
+    .modal-close:active { background: #e5e7eb; transform: scale(0.96); }
+    .modal-close:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: none; }
+    }
+    .modal-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fff4eb;
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      margin: 0 auto 14px;
+    }
+    .modal h2 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .modal p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+    .modal p.modal-uyari {
+      font-size: 13px; font-weight: 600; color: #92400e; text-align: left;
+      background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px;
+      padding: 9px 11px; margin: -6px 0 16px; line-height: 1.4;
+    }
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn.loading .spinner { display: inline-block; }
+    .btn.loading .btn-label { opacity: 0.85; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-toast {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: #fff;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+      z-index: 5;
+    }
+    .status-toast.show { opacity: 1; }
+
+
+
+    /* ===== Teşekkür: tur ilerlemesi ===== */
+    .tur-box { border-radius: 16px; padding: 14px 16px; border: 1px solid #e5e7eb; background: #f9fafb; margin-bottom: 16px; }
+    .tur-box:empty { display: none; }
+    .tur-box.wait { background: #fff7ed; border-color: #fed7aa; color: #9a4a07; }
+    .tur-box.ok { background: #ecfdf3; border-color: #a7e9c0; color: #116132; }
+    .tur-box.off { background: #f5f7ff; border-color: #dbe2fb; color: #2e3a68; }
+    .tur-box.none { color: #374151; }
+    .tur-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.75; margin-bottom: 4px; }
+    .tur-msg { font-size: 15px; font-weight: 700; line-height: 1.4; }
+    .tur-sub { font-size: 12px; line-height: 1.45; margin-top: 6px; opacity: 0.9; }
+    .tur-steps { display: flex; gap: 6px; margin-top: 10px; }
+    .tur-steps i { flex: 1; height: 8px; border-radius: 999px; background: rgba(242,122,26,0.18); }
+    .tur-steps i.on { background: linear-gradient(90deg, var(--accent), #ffb06a); }
+    .tur-box.ok .tur-steps i.on { background: var(--ok); }
+    .tur-loading { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+    .tur-loading .spinner { display: inline-block; border-color: rgba(242,122,26,0.25); border-top-color: var(--accent); }
+    .btn-next-round { margin-bottom: 6px; }
+    /* ===== Seansımı kontrol et ===== */
+    .card.kontrol { display: none; }
+    .card.kontrol.on-entry { display: flex; }
+    .card.kontrol[hidden], .card.kontrol.on-entry[hidden] { display: none !important; }
+    .k-open {
+      align-items: center; gap: 14px; padding: 16px 18px; min-height: 72px; border: 1.5px solid #ffd9bb;
+      text-align: left; cursor: pointer; font-family: inherit; color: var(--text);
+      background: linear-gradient(135deg, #fff, #fff6ee); -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s;
+    }
+    .k-open:active { transform: scale(0.98); }
+    .k-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .k-open-ic {
+      width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px; display: grid; place-items: center; font-size: 22px;
+      background: linear-gradient(135deg, var(--accent), #ff9a4a); box-shadow: 0 4px 12px rgba(242,122,26,0.35);
+    }
+    .k-open-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .k-open-txt strong { font-size: 16px; font-weight: 800; }
+    .k-open-txt span { font-size: 12px; color: var(--muted); }
+    .k-open-go { font-size: 28px; color: var(--accent); font-weight: 700; line-height: 1; }
+    #kontrol-sheet .k-desc { margin-top: 2px; }
+    .k-desc { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 6px 0 12px; }
+    .k-form { display: flex; gap: 8px; }
+    .k-form input[type="tel"] { flex: 1; min-width: 0; }
+    .k-form .btn { width: auto; flex-shrink: 0; padding: 0 16px; min-height: 50px; font-size: 15px; border-radius: 12px; }
+    .k-err { font-size: 12px; color: var(--danger); margin-top: 6px; display: none; }
+    .k-err.show { display: block; }
+    .k-result { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .k-result:empty { display: none; }
+    .k-hello { font-size: 14px; font-weight: 700; }
+    .k-box { border-radius: 14px; padding: 12px 14px; border: 1px solid; }
+    .k-box .k-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.75; margin-bottom: 4px; }
+    .k-box .k-msg { font-size: 14px; font-weight: 600; line-height: 1.4; }
+    .k-box.ok { background: #ecfdf3; border-color: #a7e9c0; color: #116132; }
+    .k-box.wait { background: #fff7ed; border-color: #fed7aa; color: #9a4a07; }
+    .k-box.no { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .k-box.none { background: #f9fafb; border-color: #e5e7eb; color: #374151; }
+    .k-bar { height: 8px; border-radius: 999px; background: rgba(242,122,26,0.18); overflow: hidden; margin-top: 8px; }
+    .k-bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), #ffb06a); border-radius: 999px; }
+    .k-time { font-size: 11px; color: var(--muted); text-align: right; }
+    .k-rule { font-size: 11px; color: var(--muted); margin-top: 12px; line-height: 1.4; }
+    /* ===== Sıralama (rank) ===== */
+    body { height: auto; } /* uzun giriş ekranında üst kısım kesilmesin */
+    body.sheet-open { overflow: hidden; }
+    body { flex-direction: column; gap: 16px; }
+    .card.rank { display: none; padding: 20px 18px 18px; }
+    .card.rank.show.on-entry { display: block; animation: fadeIn 0.25s ease; }
+    .rank-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .rank-title { font-size: 16px; font-weight: 800; letter-spacing: -0.01em; }
+    .seg { display: inline-flex; background: #f3f4f6; border-radius: 12px; padding: 3px; flex-shrink: 0; }
+    .seg button {
+      border: none; background: transparent; font-size: 13px; font-weight: 700; color: var(--muted);
+      padding: 0 12px; min-height: 36px; border-radius: 9px; cursor: pointer; font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .seg button.on { background: #fff; color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .rank-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .rank-row {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 56px;
+      border-radius: 14px; background: #fafafa; border: 1px solid #f0f0f0;
+    }
+    .rank-no {
+      width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center;
+      font-weight: 800; font-size: 14px; background: #eef0f3; color: #4b5563;
+    }
+    .rank-row.r1 { background: linear-gradient(135deg, #fff8e1, #fff3cc); border-color: #f6d77a; }
+    .rank-row.r2 { background: linear-gradient(135deg, #f7f8fa, #eceff3); border-color: #d5dae1; }
+    .rank-row.r3 { background: linear-gradient(135deg, #fff4ec, #fbe6d6); border-color: #ecc2a0; }
+    .rank-row.r1 .rank-no { background: linear-gradient(135deg, #ffd54f, #f5b400); color: #fff; box-shadow: 0 3px 8px rgba(245,180,0,0.4); }
+    .rank-row.r2 .rank-no { background: linear-gradient(135deg, #d9dee5, #a7b0bc); color: #fff; box-shadow: 0 3px 8px rgba(120,130,145,0.35); }
+    .rank-row.r3 .rank-no { background: linear-gradient(135deg, #e6a273, #c06a2f); color: #fff; box-shadow: 0 3px 8px rgba(192,106,47,0.35); }
+    .rank-who { flex: 1; min-width: 0; }
+    .rank-name { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rank-tel { font-size: 12px; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .rank-cnt { text-align: right; flex-shrink: 0; }
+    .rank-cnt strong { display: block; font-size: 18px; font-weight: 800; color: var(--accent); line-height: 1.1; }
+    .rank-cnt span { font-size: 11px; color: var(--muted); }
+    .rank-empty { font-size: 13px; color: var(--muted); text-align: center; padding: 14px 0; }
+    .btn-rank-all {
+      margin-top: 12px; background: #fff4eb; color: var(--accent); font-size: 15px; padding: 14px 18px;
+      border: 1.5px solid #ffd9bb;
+    }
+    .rank-upd { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; }
+    /* ===== Senin sıran (myRank) ===== */
+    .my-rank[hidden] { display: none !important; }
+    .my-rank { margin-top: 12px; border-radius: 14px; padding: 12px 14px; background: #fff7ed; border: 1px solid #fed7aa; }
+    .my-rank-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+    .my-rank-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #9a4a07; opacity: 0.85; }
+    .my-rank-chg { border: none; background: transparent; color: var(--accent); font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer; padding: 4px 0; min-height: 28px; }
+    .my-rank-main { font-size: 17px; font-weight: 800; color: #1a1a1a; line-height: 1.3; }
+    .my-rank-main b { color: var(--accent); font-size: 22px; }
+    .my-rank-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .my-rank-none { font-size: 14px; font-weight: 600; color: #374151; line-height: 1.4; }
+    .my-rank-desc { font-size: 12px; color: var(--muted); margin: 0 0 8px; line-height: 1.4; }
+    .my-rank-load { font-size: 13px; color: var(--muted); }
+    .sheet-backdrop {
+      position: fixed; inset: 0; background: rgba(17,24,39,0.5); z-index: 60;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-backdrop.show { display: flex; }
+    .sheet {
+      width: 100%; max-width: 480px; max-height: 88vh; max-height: 88dvh; background: #fff;
+      border-radius: 22px 22px 0 0; display: flex; flex-direction: column;
+      padding: 8px 16px calc(14px + env(safe-area-inset-bottom)); animation: sheetUp 0.25s ease;
+    }
+    @keyframes sheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .sheet-grip { width: 40px; height: 5px; border-radius: 3px; background: #e5e7eb; margin: 4px auto 10px; }
+    .sheet-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+    .sheet-x {
+      width: 44px; height: 44px; border: none; border-radius: 12px; background: #f3f4f6; color: #374151;
+      font-size: 26px; line-height: 1; cursor: pointer; flex-shrink: 0;
+    }
+    .sheet-sub { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    .sheet .seg { margin-bottom: 12px; align-self: flex-start; }
+    .sheet-body { overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; padding-bottom: 6px; }
+    .sheet .btn-ghost { margin-top: 10px; background: #f3f4f6; color: #374151; }
+    .bekle-box {
+      display: none; margin-top: 14px; padding: 14px 16px; border-radius: 14px;
+      background: #fff7ed; border: 1.5px solid #fdba74; color: #9a3412; text-align: center;
+    }
+    .bekle-box.show { display: block; }
+    .bekle-box .bekle-title { font-weight: 800; font-size: 15px; margin-bottom: 4px; }
+    .bekle-box .bekle-text { font-size: 14px; line-height: 1.45; }
+    .bekle-box .bekle-text b { font-variant-numeric: tabular-nums; }
+    .bekle-box.done { background: #ecfdf5; border-color: #6ee7b7; color: #065f46; }
+    .bekle-thanks { margin: 6px 0 4px; font-size: 13px; color: #9a3412; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="card" id="app">
+    <div class="status-toast" id="toast"></div>
+
+    <!-- ENTRY -->
+    <div class="screen active" id="screen-entry">
+      <div class="brand">
+        <div class="brand-mark">T</div>
+        <div class="brand-text">
+          <h1>Tıklama App</h1>
+          <p id="entry-subtitle">Link görevleri yükleniyor…</p>
+        </div>
+      </div>
+      <p class="step-desc" style="margin-bottom:18px;">
+        Başlamak için adınızı ve telefon numaranızı girin.
+      </p>
+      <div class="field">
+        <label for="name">İsim</label>
+        <input type="text" id="name" placeholder="Adınız Soyadınız" autocomplete="name" maxlength="60" />
+        <div class="error-msg" id="name-err">Lütfen isminizi girin.</div>
+      </div>
+      <div class="field">
+        <label for="phone">Telefon</label>
+        <input type="tel" id="phone" name="tiklama-tel" placeholder="05xx xxx xx xx" inputmode="numeric" autocomplete="off" maxlength="14" />
+        <div class="hint">Örnek: 05xx xxx xx xx</div>
+        <div class="error-msg" id="phone-err">Geçerli bir Türkiye cep numarası girin (05xx…).</div>
+      </div>
+      <button class="btn btn-primary" id="btn-start" type="button" disabled>
+        <span class="spinner"></span>
+        <span class="btn-label">Yükleniyor…</span>
+      </button>
+      <div class="bekle-box" id="bekle-box" role="status" aria-live="polite">
+        <div class="bekle-title" id="bekle-title">⏳ Biraz sonra tekrar dene</div>
+        <div class="bekle-text" id="bekle-text"></div>
+      </div>
+
+    </div>
+
+    <!-- STEP -->
+    <div class="screen" id="screen-step">
+      <div class="brand">
+        <div class="brand-mark">T</div>
+        <div class="brand-text">
+          <h1>Tıklama App</h1>
+          <p>Linke tıklayın, geri dönün</p>
+        </div>
+      </div>
+      <div class="step-badge" id="step-badge">Adım 1 / 12</div>
+      <div class="step-title">Trendyol linki</div>
+      <p class="step-desc">Aşağıdaki butona dokunun, link Trendyol uygulamasında açılacak. Sonra buraya dönün.</p>
+
+      <button class="btn btn-link" id="btn-open-link" type="button">
+        Linki Aç →
+      </button>
+      <div class="away-warn" id="away-warn" role="alert"></div>
+
+      <div class="timer-wrap" id="timer-wrap">
+        <div class="timer-top">
+          <span id="timer-label">Sonraki link için bekleyin</span>
+          <strong id="timer-text"></strong>
+        </div>
+        <div class="progress">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+      </div>
+
+      <div class="dots" id="dots"></div>
+
+      <button class="btn btn-ghost btn-restart-step" id="btn-restart-step" type="button">Baştan başla</button>
+    </div>
+
+    <!-- THANK YOU -->
+    <div class="screen" id="screen-thanks">
+      <div class="thank-icon">✓</div>
+      <div class="thank-title">Tur tamamlandı! 🎉</div>
+      <p class="thank-desc" id="thank-desc">Bu turdaki linklerin tamamı kaydedildi.</p>
+      <div class="tur-box" id="tur-box" aria-live="polite"></div>
+      <button class="btn btn-primary btn-next-round" id="btn-next-round" type="button" hidden style="display:none">
+        <span class="spinner"></span>
+        <span class="btn-label">Yeni tura başla</span>
+      </button>
+      <button class="btn btn-ghost" id="btn-restart" type="button">Yeni oturum başlat</button>
+    </div>
+  </div>
+
+  <!-- SEANSIMI KONTROL ET (buton; içerik alt pencerede) -->
+  <button class="card kontrol on-entry k-open" id="kontrol" type="button" aria-haspopup="dialog" hidden>
+    <span class="k-open-ic">🎟️</span>
+    <span class="k-open-txt">
+      <strong>Katılımımı kontrol et</strong>
+      <span>Son seansta çekiliş listesine girdin mi?</span>
+    </span>
+    <span class="k-open-go">›</span>
+  </button>
+
+  <!-- SIRALAMA -->
+  <section class="card rank on-entry" id="rank" aria-label="En çok katılanlar">
+    <div class="rank-head">
+      <div class="rank-title">🏆 En Çok Katılanlar</div>
+      <div class="seg" role="tablist">
+        <button type="button" class="on" data-period="weekly">Haftalık</button>
+        <button type="button" data-period="monthly">Aylık</button>
+      </div>
+    </div>
+    <ol class="rank-list" id="rank-top"></ol>
+    <div class="my-rank" id="my-rank" hidden aria-live="polite">
+      <div class="my-rank-top">
+        <div class="my-rank-lbl" id="my-rank-lbl">Senin sıran</div>
+        <button class="my-rank-chg" id="btn-my-rank-chg" type="button" hidden>Numarayı değiştir</button>
+      </div>
+      <div id="my-rank-view"></div>
+      <div id="my-rank-ask" hidden>
+        <div class="my-rank-desc">Kendi sıranı görmek için telefon numaranı yaz.</div>
+        <div class="k-form">
+          <input type="tel" id="my-rank-phone" placeholder="05xx xxx xx xx" inputmode="numeric" autocomplete="off" maxlength="14" aria-label="Telefon numarası" />
+          <button class="btn btn-primary" id="btn-my-rank" type="button">Sıramı gör</button>
+        </div>
+        <div class="k-err" id="my-rank-err"></div>
+      </div>
+    </div>
+    <button class="btn btn-rank-all" id="btn-rank-all" type="button">Tamamını gör (İlk 25)</button>
+    <div class="rank-upd" id="rank-upd"></div>
+  </section>
+
+  <!-- Modal: close Trendyol -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <button class="modal-close" id="btn-modal-close" type="button" aria-label="Uyarıyı kapat">×</button>
+      <div class="modal-icon">⚠</div>
+      <h2>Trendyol uygulamasını kapatın</h2>
+      <p id="modal-desc">Linke tıkladınız. Trendyol sekmesini / uygulamasını kapatıp buraya dönün, ardından devam edin.</p>
+      <p class="modal-uyari" id="modal-uyari" role="note">⚠️ Trendyol mağazası açılmadan kısa sürede işlem yaparsanız hak kazanamayabilirsiniz.</p>
+      <button class="btn btn-secondary" id="btn-closed" type="button">
+        <span class="spinner"></span>
+        <span class="btn-label">Kapattım</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Seansımı kontrol et: alt pencere -->
+  <div class="sheet-backdrop" id="kontrol-sheet" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="kontrol-sheet-title">
+      <div class="sheet-grip"></div>
+      <div class="sheet-top">
+        <div class="rank-title" id="kontrol-sheet-title">🎟️ Seansımı Kontrol Et</div>
+        <button class="sheet-x" id="btn-kontrol-x" type="button" aria-label="Kapat">×</button>
+      </div>
+      <div class="sheet-body">
+        <p class="k-desc">Telefon numaranı gir, son seansta çekiliş listesine girip girmediğini gör.</p>
+        <div class="k-form">
+          <input type="tel" id="k-phone" placeholder="05xx xxx xx xx" inputmode="numeric" autocomplete="off" maxlength="14" aria-label="Telefon numarası" />
+          <button class="btn btn-primary" id="btn-kontrol" type="button">
+            <span class="spinner"></span>
+            <span class="btn-label">Kontrol et</span>
+          </button>
+        </div>
+        <div class="k-err" id="k-err"></div>
+        <div class="k-result" id="k-result" aria-live="polite"></div>
+        <p class="k-rule">Listeye girmek için bir seansta 12 linkin tamamını en az 4 kez bitirmelisin.</p>
+      </div>
+      <button class="btn btn-ghost" id="btn-kontrol-close" type="button">Kapat</button>
+    </div>
+  </div>
+
+  <!-- Sıralama: İlk 25 alt pencere -->
+  <div class="sheet-backdrop" id="rank-sheet" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="rank-sheet-title">
+      <div class="sheet-grip"></div>
+      <div class="sheet-top">
+        <div class="rank-title" id="rank-sheet-title">🏆 İlk 25</div>
+        <button class="sheet-x" id="btn-rank-x" type="button" aria-label="Kapat">×</button>
+      </div>
+      <div class="sheet-sub" id="rank-sheet-sub"></div>
+      <div class="seg" role="tablist">
+        <button type="button" class="on" data-period="weekly">Haftalık</button>
+        <button type="button" data-period="monthly">Aylık</button>
+      </div>
+      <div class="sheet-body"><ol class="rank-list" id="rank-all"></ol></div>
+      <button class="btn btn-ghost" id="btn-rank-close" type="button">Kapat</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== SIRALAMA BAYRAKLARI (geçici durdurma 02.11.2026 — geri almak için ikisini de true yap) =====
+    var SIRALAMA_HAFTALIK_GOSTER = false; // false: Haftalık İlk 25 sekmesi/düğmesi/listesi yok; yalnız Aylık gösterilir
+    var SIRALAMA_AKTIF = false;           // false: 'Senin sıran' (myRank) kutusu ve sorgusu kapalı; yalnız aylık liste görüntülenir
+    var SIRALAMA_GOSTER = false;          // false (02.11.2026 09:29): sıralama kartı ve İlk 25 penceresi tamamen gizli, hiç 'rank'/'myRank' isteği yok
+    // ===== LINKS (fallback if sheet fetch fails) =====
+    var DEFAULT_LINKS = [
+      'https://ty.gl/qn0a5t8k1gohu',
+      'https://ty.gl/9r1yd1xlfk27r',
+      'https://ty.gl/jmxpd7ghsh2r3',
+      'https://ty.gl/p827wlkmwtbza',
+      'https://ty.gl/qn0a5t8k1gohu',
+      'https://ty.gl/ef1l6mogmc86s',
+      'https://ty.gl/qn0a5t8k1gohu',
+      'https://ty.gl/9r1yd1xlfk27r',
+      'https://ty.gl/jmxpd7ghsh2r3',
+      'https://ty.gl/p827wlkmwtbza',
+      'https://ty.gl/qn0a5t8k1gohu',
+      'https://ty.gl/ef1l6mogmc86s'
+    ];
+    // Active list for this page load / session (mutated after fetch)
+    var LINKS = DEFAULT_LINKS.slice();
+    // =============================
+
+    var WAIT_MS = 0; // süresiz: linkler arası 30 sn bekleme KALDIRILDI (eski: 30000)
+    var STORAGE_KEY = 'tiklama_session_v2';
+    var RESUME_MAX_MS = 30 * 60 * 1000; // sayfa yenilenirse (Trendyol dönüşü) en fazla 30 dk içindeki tur sürdürülür
+
+    var state = {
+      sessionId: null,
+      name: '',
+      phone: '',
+      step: 0,            // 0-based current step index
+      clicked: false,     // whether current step was tapped (local)
+      confirmed: [],      // per-step: server confirmed click log
+      statuses: [],       // 'done' | 'pending' for each step
+      tapAt: null,        // Date.now() when current link was first tapped
+      timerId: null,      // interval used only to refresh UI from Date.now()
+      awaitingReturn: false,
+      modalOpen: false,
+      logPending: false,  // click log in flight / retrying
+      logFailed: false,   // retries exhausted for current step
+      checking: false,    // Kapattım → sheet check in flight
+      linkGateUntil: null,// epoch ms: next link locked until this (30s rule after modal)
+      sessionDone: false  // last link click+finish fired
+    };
+
+    // Girişteki "Katılımımı kontrol et" butonu (geçici olarak kapalı). Tekrar açmak için true yap.
+    const KONTROL_BUTONU_GOSTER = false;
+
+    // ---- helpers ----
+    function $(id) { return document.getElementById(id); }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function (el) {
+        el.classList.toggle('active', el.id === id);
+      });
+      var rk = document.getElementById('rank');
+      if (rk) rk.classList.toggle('on-entry', id === 'screen-entry');
+      var kc = document.getElementById('kontrol');
+      if (kc) { kc.classList.toggle('on-entry', id === 'screen-entry'); kc.hidden = !KONTROL_BUTONU_GOSTER; }
+      if (id !== 'screen-entry' && typeof closeRankSheet === 'function') closeRankSheet();
+      if (id !== 'screen-entry' && typeof closeKontrolSheet === 'function') closeKontrolSheet();
+    }
+
+    function toast(msg) {
+      var t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 1800);
+    }
+
+    function saveLocal() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          sessionId: state.sessionId,
+          name: state.name,
+          phone: state.phone,
+          step: state.step,
+          statuses: state.statuses,
+          clicked: state.clicked,
+          confirmed: state.confirmed,
+          tapAt: state.tapAt,
+          linkGateUntil: state.linkGateUntil,
+          awaitingReturn: state.awaitingReturn,
+          sessionDone: state.sessionDone,
+          dv: state.dv || null,
+          links: LINKS.slice(),
+          savedAt: Date.now(),
+          api: API_URL
+        }));
+      } catch (e) {}
+    }
+
+    function loadLocal() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        var o = JSON.parse(raw);
+        // Eski/bayat tur asla sürdürülmez: kayıt zamanı yoksa, 30 dk'dan eskiyse veya farklı sunucuya aitse silinir
+        if (!o || typeof o.savedAt !== 'number' || Date.now() - o.savedAt > RESUME_MAX_MS || o.savedAt > Date.now() + 60000 || o.api !== API_URL) {
+          clearLocal();
+          return null;
+        }
+        return o;
+      } catch (e) { return null; }
+    }
+
+    function clearLocal() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      try { localStorage.removeItem('tiklama_session_v1'); } catch (e) {}
+    }
+
+    function formatPhoneInput(raw) {
+      var digits = String(raw || '').replace(/\D/g, '');
+      if (digits.length && digits[0] !== '0') {
+        if (digits.length === 10 && digits[0] === '5') digits = '0' + digits;
+      }
+      digits = digits.slice(0, 11);
+      var out = digits;
+      if (digits.length > 4) out = digits.slice(0, 4) + ' ' + digits.slice(4);
+      if (digits.length > 7) out = digits.slice(0, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7);
+      if (digits.length > 9) out = digits.slice(0, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7, 9) + ' ' + digits.slice(9);
+      return out;
+    }
+
+    function isValidTRMobile(formatted) {
+      var digits = String(formatted || '').replace(/\D/g, '');
+      return /^05\d{9}$/.test(digits);
+    }
+
+    /** Digits with leading 0, formatted as "05xx xxx xx xx" for the sheet. */
+    function phoneForSheet(formatted) {
+      var digits = String(formatted || '').replace(/\D/g, '');
+      if (digits.length === 10 && digits[0] === '5') digits = '0' + digits;
+      if (digits.length === 11) {
+        return digits.slice(0, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7, 9) + ' ' + digits.slice(9);
+      }
+      return digits;
+    }
+
+    function remainingMs() {
+      if (!state.tapAt) return 0;
+      return Math.max(0, WAIT_MS - (Date.now() - state.tapAt));
+    }
+
+    function remainingSec() {
+      return Math.ceil(remainingMs() / 1000);
+    }
+
+    function waitDone() {
+      return !state.tapAt || remainingMs() <= 0;
+    }
+
+    // Apps Script web app (JSON API via doPost). text/plain avoids CORS preflight.
+    var API_URL = 'https://script.google.com/macros/s/AKfycbxI63Jc9ixORnF_QW3nzdODLF78fCkaSdBSqdOMFCS2phomxin0yRJo-EzsAN4pgdiPBQ/exec';
+
+    function apiCall(payload, attempt) {
+      attempt = attempt || 0;
+      var maxAttempts = 3; // attempt 0,1,2 → up to 3 tries
+      return fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        redirect: 'follow'
+      }).then(function (res) {
+        return res.text().then(function (text) {
+          var data;
+          try { data = JSON.parse(text); } catch (e) {
+            throw new Error('Geçersiz API yanıtı');
+          }
+          if (data && data.bekle) {
+            // Turlar arası bekleme: tekrar deneme yok, kalan süre ile birlikte yukarı ilet
+            var be = new Error(data.error || 'Biraz sonra tekrar dene');
+            be.bekle = true; be.kalanSn = Math.max(1, +data.kalanSn || 0); be.noRetry = true;
+            throw be;
+          }
+          if (!data || data.ok !== true) {
+            var ae = new Error((data && data.error) || 'API hatası');
+            if (/Oturum bulunamad|session not found/i.test(ae.message)) { ae.sessionGone = true; ae.noRetry = true; }
+            throw ae;
+          }
+          return data.result;
+        });
+      }).catch(function (err) {
+        if (err && err.noRetry) throw err;
+        if (attempt < maxAttempts - 1) {
+          var delay = attempt === 0 ? 1000 : 2000; // 1s, then 2s
+          toast('Kayıt hatası, tekrar deneniyor…');
+          return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+              apiCall(payload, attempt + 1).then(resolve, reject);
+            }, delay);
+          });
+        }
+        throw err;
+      });
+    }
+
+    function runServer(fnName, args, onSuccess, onFailure) {
+      var payload;
+      if (fnName === 'startSession') {
+        payload = { action: 'start', name: args[0], phone: args[1], meta: args[2] || veriMeta_() };
+      } else if (fnName === 'logClick') {
+        payload = { action: 'click', sessionId: args[0], linkIndex: args[1], clicked: args[2], davranis: davranisOzet_() };
+      } else if (fnName === 'finish') {
+        payload = { action: 'finish', sessionId: args[0], davranis: davranisOzet_() };
+      } else if (fnName === 'getLinks') {
+        payload = { action: 'links' };
+      } else if (fnName === 'clickAndFinish') {
+        payload = { action: 'clickfinish', sessionId: args[0], linkIndex: args[1], clicked: args[2] !== false, davranis: davranisOzet_() };
+      } else if (fnName === 'checkClick') {
+        payload = { action: 'check', sessionId: args[0], linkIndex: args[1] };
+      } else {
+        console.error('Unknown fn', fnName);
+        if (onFailure) onFailure(new Error('Unknown fn'));
+        return;
+      }
+      apiCall(payload).then(function (result) {
+        if (onSuccess) onSuccess(result);
+      }).catch(function (err) {
+        if (err && err.sessionGone) { oturumYok_(); return; }
+        console.error(fnName, err);
+        if (onFailure) onFailure(err);
+        else toast('Kayıt hatası, tekrar deneniyor…');
+      });
+    }
+
+    /** Sunucu turu tanımıyor (eski/bayat tur): tekrar deneme yok, kayıt silinir, giriş ekranına dönülür. */
+    var oturumYokAt = 0;
+    function oturumYok_() {
+      clearLocal();
+      state.sessionId = null; state.sessionDone = true;
+      try { stopWaitTicker(); } catch (e) {}
+      var rb = $('btn-restart');
+      if (rb) rb.click(); // restartToEntry: durum sıfırlanır, giriş ekranı + taze linkler
+      if (Date.now() - oturumYokAt > 3000) { oturumYokAt = Date.now(); setTimeout(function () { toast('Tur bulunamadı, lütfen tekrar Başla’ya basın.'); }, 50); }
+    }
+
+    /** Başla / yeni tur: önce eski turu tamamen sil, sonra linkleri sunucudan taze çek. */
+    function taptazeLinkler_(done) {
+      runServer('getLinks', [], function (result) {
+        if (Array.isArray(result) && result.length) applyLinks(result);
+        done();
+      }, function () { done(); });
+    }
+
+    /** Survives tab backgrounding when opening Trendyol (last step). */
+    function beaconPost(payload) {
+      var body = JSON.stringify(payload);
+      try {
+        if (navigator.sendBeacon) {
+          var blob = new Blob([body], { type: 'text/plain;charset=utf-8' });
+          if (navigator.sendBeacon(API_URL, blob)) return true;
+        }
+      } catch (e) {}
+      try {
+        fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: body,
+          keepalive: true,
+          redirect: 'follow'
+        }).catch(function () {});
+        return true;
+      } catch (e2) {
+        return false;
+      }
+    }
+
+    function applyLinks(list) {
+      var cleaned = (list || []).map(function (u) {
+        return String(u || '').trim();
+      }).filter(Boolean);
+      if (cleaned.length) {
+        LINKS = cleaned;
+      } else {
+        LINKS = DEFAULT_LINKS.slice();
+      }
+      var sub = $('entry-subtitle');
+      if (sub) sub.textContent = LINKS.length + ' adımlık link görevleri';
+      var thank = $('thank-desc');
+      if (thank) thank.textContent = 'Bu turdaki ' + LINKS.length + ' linkin tamamı kaydedildi.';
+    }
+
+    function setStartReady(ready) {
+      var btn = $('btn-start');
+      var label = btn.querySelector('.btn-label');
+      if (ready) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        if (label) label.textContent = 'Başla';
+      } else {
+        btn.disabled = true;
+        btn.classList.add('loading');
+        if (label) label.textContent = 'Yükleniyor…';
+      }
+    }
+
+    /** Fresh load: read Linkler sheet. Failures fall back to DEFAULT_LINKS. */
+    function loadLinksFromSheet(done) {
+      setStartReady(false);
+      runServer('getLinks', [], function (result) {
+        applyLinks(Array.isArray(result) ? result : []);
+        setStartReady(true);
+        if (done) done();
+      }, function () {
+        applyLinks(DEFAULT_LINKS);
+        setStartReady(true);
+        if (done) done();
+      });
+    }
+
+    // ---- tur içi link tazeleme (Linkler sekmesindeki değişiklikler turdaki kişiye de yansısın) ----
+    var LINK_REFRESH_MIN_MS = 10000;   // zorlamasız çağrılar arası en az süre
+    var LINK_REFRESH_EVERY_MS = 30000; // adım ekranı açıkken periyodik kontrol
+    var linkRefreshInFlight = false;
+    var linkRefreshLastAt = 0;
+    var linkRefreshTimerId = null;
+
+    function isValidLinkUrl_(u) {
+      return typeof u === 'string' && /^https?:\/\/\S+$/i.test(u.trim());
+    }
+    function roundActive_() {
+      return !!(state.sessionId && !state.sessionDone);
+    }
+
+    /**
+     * Taze listeyi uygula. Tur sürerken tur uzunluğu ve adım durumu korunur,
+     * sadece mevcut indekslerdeki URL'ler değişir (eksik/geçersizse eldeki link kalır).
+     * Tur yokken (giriş / teşekkür ekranı) liste tamamen yenilenir.
+     */
+    function mergeFreshLinks_(list) {
+      if (!Array.isArray(list)) return false;
+      var fresh = list.map(function (u) { return String(u || '').trim(); });
+      if (!fresh.some(isValidLinkUrl_)) return false;
+      if (!roundActive_()) {
+        applyLinks(fresh.filter(isValidLinkUrl_));
+        return true;
+      }
+      var changed = false;
+      var next = LINKS.map(function (old, i) {
+        var nu = fresh[i];
+        if (isValidLinkUrl_(nu) && nu !== old) { changed = true; return nu; }
+        return old;
+      });
+      if (changed) {
+        LINKS = next;
+        saveLocal();
+      }
+      return changed;
+    }
+
+    /** Arka planda Linkler'i oku (sessiz: hata/boş sonuçta eldeki linkler kalır, toast yok). */
+    function refreshLinksInBackground(force) {
+      if (linkRefreshInFlight) return;
+      var now = Date.now();
+      if (!force && now - linkRefreshLastAt < LINK_REFRESH_MIN_MS) return;
+      linkRefreshInFlight = true;
+      linkRefreshLastAt = now;
+      // Takılı kalan istek yeni denemeleri sonsuza dek engellemesin
+      setTimeout(function () { if (linkRefreshLastAt === now) linkRefreshInFlight = false; }, 20000);
+      try {
+        fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'links' }),
+          redirect: 'follow',
+          cache: 'no-store'
+        }).then(function (res) { return res.text(); }).then(function (text) {
+          var data = JSON.parse(text);
+          if (data && data.ok === true) mergeFreshLinks_(data.result);
+        }).catch(function () { /* sessiz: eldeki linkler kullanılmaya devam */ })
+          .then(function () { linkRefreshInFlight = false; });
+      } catch (e) {
+        linkRefreshInFlight = false;
+      }
+    }
+
+    function startLinkRefreshLoop_() {
+      if (linkRefreshTimerId) return;
+      linkRefreshTimerId = setInterval(function () {
+        if (document.hidden || !roundActive_()) return;
+        var st = $('screen-step');
+        if (!st || !st.classList.contains('active')) return;
+        refreshLinksInBackground(false);
+      }, LINK_REFRESH_EVERY_MS);
+    }
+
+    // ===== VERİ TOPLAMA (cihaz, parmak izi, IP/konum, davranış) — hepsi hata yutar, akışı asla bozmaz =====
+    var VERI = { hint: null, ip: null, ipBekle: null, fp: '', formBasAt: null };
+    function veriKes_(v, n) { return String(v == null ? '' : v).slice(0, n || 120); }
+    function cihazBilgisi_() {
+      var ua = navigator.userAgent || '', os = '', model = '', tar = '', m;
+      if ((m = /Android\s*([\d.]+)?/i.exec(ua))) {
+        os = 'Android' + (m[1] ? ' ' + m[1] : '');
+        var mm = /Android[^;)]*;\s*([^;)]+?)(?:\s+Build\/[^;)]*)?[;)]/i.exec(ua);
+        if (mm && !/^(K|wv|Linux|U|[a-z]{2}[-_][a-z]{2})$/i.test(mm[1].trim())) model = mm[1].trim();
+      } else if ((m = /(iPhone|iPad|iPod).*?OS ([\d_]+)/i.exec(ua))) {
+        os = 'iOS ' + m[2].replace(/_/g, '.'); model = m[1];
+      } else if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) { os = 'iPadOS'; model = 'iPad'; }
+      else if (/Windows NT ([\d.]+)/.test(ua)) os = 'Windows';
+      else if (/Mac OS X/.test(ua)) os = 'macOS';
+      else if (/CrOS/.test(ua)) os = 'ChromeOS';
+      else if (/Linux/.test(ua)) os = 'Linux';
+      var B = [
+        [/Instagram ([\d.]+)/, 'Instagram (uygulama içi)'], [/FBAV\/([\d.]+)/, 'Facebook (uygulama içi)'],
+        [/TikTok[ \/]([\d.]+)/i, 'TikTok (uygulama içi)'], [/SamsungBrowser\/([\d.]+)/, 'Samsung Internet'],
+        [/YaBrowser\/([\d.]+)/, 'Yandex'], [/OPR\/([\d.]+)/, 'Opera'], [/EdgA?\/([\d.]+)/, 'Edge'],
+        [/HuaweiBrowser\/([\d.]+)/, 'Huawei Browser'], [/MiuiBrowser\/([\d.]+)/, 'Mi Browser'],
+        [/(?:Firefox|FxiOS)\/([\d.]+)/, 'Firefox'], [/CriOS\/([\d.]+)/, 'Chrome'],
+        [/; wv\).*Chrome\/([\d.]+)/, 'Android WebView'], [/Chrome\/([\d.]+)/, 'Chrome'],
+        [/Version\/([\d.]+).*Safari/, 'Safari']
+      ];
+      for (var i = 0; i < B.length; i++) { if ((m = B[i][0].exec(ua))) { tar = B[i][1] + ' ' + m[1].split('.').slice(0, 2).join('.'); break; } }
+      var h = VERI.hint;
+      if (h) {
+        if (h.model) model = h.model;
+        if (h.platformVersion && /^Android/.test(os) && h.platform === 'Android') os = 'Android ' + h.platformVersion.split('.')[0];
+        if (h.fullVersionList && /^Chrome /.test(tar)) {
+          var c = h.fullVersionList.filter(function (b) { return /Google Chrome|Chromium/.test(b.brand); })[0];
+          if (c) tar = 'Chrome ' + c.version.split('.').slice(0, 2).join('.');
+        }
+      }
+      var s = window.screen || {}, dpr = window.devicePixelRatio || 1;
+      return {
+        os: os || 'Bilinmiyor', model: model, tarayici: tar || veriKes_(ua, 60),
+        ekran: (s.width || 0) + 'x' + (s.height || 0) + ' @' + (Math.round(dpr * 100) / 100),
+        dil: (navigator.languages && navigator.languages.length ? navigator.languages.slice(0, 3).join(',') : (navigator.language || ''))
+      };
+    }
+    function veriHash_(str) { // cyrb53 → 14 hex
+      var h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+      for (var i = 0, ch; i < str.length; i++) { ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+      return ('0000000' + (h2 >>> 0).toString(16)).slice(-8) + ('0000000' + (h1 >>> 0).toString(16)).slice(-6);
+    }
+    function parmakIzi_() {
+      var p = [], s = window.screen || {};
+      function t(f) { try { p.push(f()); } catch (e) { p.push('x'); } }
+      t(function () { return [s.width, s.height, s.colorDepth, window.devicePixelRatio].join('x'); });
+      t(function () { return Intl.DateTimeFormat().resolvedOptions().timeZone; });
+      t(function () { return new Date(2026, 0, 1).getTimezoneOffset(); });
+      t(function () { return (navigator.languages || []).join(','); });
+      t(function () { return [navigator.hardwareConcurrency, navigator.deviceMemory, navigator.maxTouchPoints, navigator.platform].join('|'); });
+      t(function () { // canvas
+        var c = document.createElement('canvas'); c.width = 240; c.height = 60;
+        var x = c.getContext('2d'); x.textBaseline = 'top'; x.font = '16px Arial';
+        x.fillStyle = '#f60'; x.fillRect(100, 1, 62, 20);
+        x.fillStyle = '#069'; x.fillText('Tıklama ğüşiöç 😃 1.2', 2, 15);
+        x.fillStyle = 'rgba(102,204,0,0.7)'; x.fillText('Tıklama ğüşiöç 😃 1.2', 4, 17);
+        x.beginPath(); x.arc(50, 30, 20, 0, Math.PI * 2); x.stroke();
+        return veriHash_(c.toDataURL());
+      });
+      t(function () { // WebGL
+        var c = document.createElement('canvas'), g = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (!g) return 'nogl';
+        var d = g.getExtension('WEBGL_debug_renderer_info');
+        return d ? g.getParameter(d.UNMASKED_VENDOR_WEBGL) + '~' + g.getParameter(d.UNMASKED_RENDERER_WEBGL) : g.getParameter(g.RENDERER);
+      });
+      t(function () { // fonts
+        var base = ['monospace', 'sans-serif', 'serif'], list = ['Roboto', 'Noto Sans', 'Samsung Sans', 'SamsungOne', 'MiSans', 'HarmonyOS Sans',
+          'Helvetica Neue', 'San Francisco', 'Arial', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia', 'Segoe UI', 'Ubuntu', 'Calibri', 'OPPOSans', 'Product Sans'];
+        var c = document.createElement('canvas').getContext('2d'), w = {}, out = '';
+        base.forEach(function (b) { c.font = '72px ' + b; w[b] = c.measureText('mmmmmmmmlli10OO').width; });
+        list.forEach(function (f) {
+          var has = base.some(function (b) { c.font = '72px "' + f + '",' + b; return c.measureText('mmmmmmmmlli10OO').width !== w[b]; });
+          out += has ? '1' : '0';
+        });
+        return out;
+      });
+      return 'fp-' + veriHash_(p.join('§'));
+    }
+    function veriIpBaslat_() {
+      if (VERI.ipBekle) return VERI.ipBekle;
+      VERI.ipBekle = new Promise(function (resolve) {
+        var bitti = false;
+        function son(v) { if (bitti) return; bitti = true; if (v) VERI.ip = v; resolve(VERI.ip); }
+        setTimeout(function () { son(null); }, 4000);
+        try {
+          var ipUrls = ['https://gorev-sayfa.pages.dev/api/ip'];
+          (function dene(i) {
+            if (i >= ipUrls.length) { son(null); return; }
+            fetch(ipUrls[i], { cache: 'no-store' }).then(function (r) { return r.json(); })
+              .then(function (d) { if (d && typeof d === 'object' && d.ip) son(d); else dene(i + 1); })
+              .catch(function () { dene(i + 1); });
+          })(0);
+        } catch (e) { son(null); }
+      });
+      return VERI.ipBekle;
+    }
+    function veriBaslat_() {
+      try {
+        if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+          navigator.userAgentData.getHighEntropyValues(['model', 'platform', 'platformVersion', 'fullVersionList'])
+            .then(function (h) { VERI.hint = h; veriPanel_(); }).catch(function () {});
+        }
+      } catch (e) {}
+      try { VERI.fp = parmakIzi_(); } catch (e) { VERI.fp = ''; }
+      veriIpBaslat_().then(function () { veriPanel_(); });
+      ['name', 'phone'].forEach(function (id) {
+        var el = $(id); if (!el) return;
+        ['focus', 'input', 'keydown'].forEach(function (ev) {
+          el.addEventListener(ev, function () { if (!VERI.formBasAt) VERI.formBasAt = Date.now(); });
+        });
+      });
+      veriPanel_();
+    }
+    /** start isteğine eklenecek meta (form süresi dahil). */
+    function veriMeta_() {
+      var m = {};
+      try {
+        var c = cihazBilgisi_(), ip = VERI.ip || {};
+        m = {
+          os: c.os, model: veriKes_(c.model, 60), tarayici: veriKes_(c.tarayici, 60), ekran: c.ekran, dil: veriKes_(c.dil, 40),
+          parmakIzi: VERI.fp,
+          ip: veriKes_(ip.ip, 60), sehir: veriKes_([ip.sehir, ip.ulke].filter(Boolean).join(' / '), 60), operator: veriKes_(ip.operator, 80),
+          formSn: VERI.formBasAt ? Math.round((Date.now() - VERI.formBasAt) / 100) / 10 : ''
+        };
+      } catch (e) {}
+      return m;
+    }
+    /** Link başına: dokunuş → sayfaya geri dönüş (sn). Arka plana geçmediyse '!' (Kapattım'a kadar geçen süre). */
+    function davranisDokunus_(stepIdx) {
+      try {
+        if (!state.dv) state.dv = { s: {}, bg: {} };
+        state.dv.cur = stepIdx; state.dv.at = Date.now(); state.dv.gizlendi = false; state.dv.donus = null;
+      } catch (e) {}
+    }
+    function davranisGorunurluk_() {
+      try {
+        var d = state.dv; if (!d || d.cur == null || !d.at) return;
+        if (document.hidden) { d.gizlendi = true; d.bg[d.cur + 1] = 1; }
+        else if (d.gizlendi && d.donus == null) { d.donus = Date.now(); d.s[d.cur + 1] = Math.round((d.donus - d.at) / 1000) + 's'; }
+        saveLocal();
+      } catch (e) {}
+    }
+    function davranisKapat_(stepIdx) {
+      try {
+        var d = state.dv; if (!d || d.cur !== stepIdx || !d.at) return;
+        if (!d.s[stepIdx + 1]) d.s[stepIdx + 1] = Math.round((Date.now() - d.at) / 1000) + 's' + (d.gizlendi ? '' : '!');
+        d.cur = null;
+      } catch (e) {}
+    }
+    function davranisOzet_() {
+      try {
+        var d = state.dv || { s: {}, bg: {} }, keys = Object.keys(d.s).map(Number).sort(function (a, b) { return a - b; });
+        return { sureler: keys.map(function (k) { return k + ':' + d.s[k]; }).join(','), arka: Object.keys(d.bg).length };
+      } catch (e) { return { sureler: '', arka: '' }; }
+    }
+    /** ?veri=1 ile giriş ekranında toplanan verileri göster (önizleme / kontrol için). */
+    function veriPanel_() {
+      try {
+        if (!/[?&]veri=1\b/.test(location.search)) return;
+        var el = $('veri-panel');
+        if (!el) { el = document.createElement('pre'); el.id = 'veri-panel'; el.style.cssText = 'white-space:pre-wrap;font-size:11px;background:#111;color:#9f9;padding:10px;border-radius:10px;margin-top:14px;'; $('screen-entry').appendChild(el); }
+        var m = veriMeta_(), o = davranisOzet_();
+        el.textContent = 'Toplanan veriler (önizleme)\n' + Object.keys(m).map(function (k) { return k + ': ' + m[k]; }).join('\n') +
+          '\nLink süreleri: ' + o.sureler + '\nArka plana geçti: ' + o.arka;
+      } catch (e) {}
+    }
+
+    // ---- entry ----
+    function setupEntry() {
+      var phoneEl = $('phone');
+      phoneEl.addEventListener('input', function () {
+        phoneEl.value = formatPhoneInput(phoneEl.value);
+        phoneEl.setSelectionRange(phoneEl.value.length, phoneEl.value.length);
+        phoneEl.classList.remove('invalid');
+        $('phone-err').classList.remove('show');
+        bekleGizle_();
+      });
+
+      $('name').addEventListener('input', function () {
+        $('name').classList.remove('invalid');
+        $('name-err').classList.remove('show');
+      });
+
+      $('btn-start').addEventListener('click', startFlow);
+    }
+
+    /** Yeni oturum (tur) state'i: startFlow ve "N. tura başla" ortak kullanır. */
+    function applyNewSession_(sessionId, name, phoneText) {
+      stopWaitTicker();
+      state.sessionId = sessionId;
+      state.name = name;
+      state.phone = phoneText;
+      state.step = 0;
+      state.statuses = LINKS.map(function () { return 'pending'; });
+      state.confirmed = LINKS.map(function () { return false; });
+      state.clicked = false;
+      state.tapAt = null;
+      state.awaitingReturn = false;
+      state.modalOpen = false;
+      state.logPending = false;
+      state.logFailed = false;
+      state.checking = false;
+      state.linkGateUntil = null;
+      state.sessionDone = false;
+      state.dv = { s: {}, bg: {} };
+      saveLocal();
+    }
+
+    // ---- Turlar arası bekleme KALDIRILDI (süresiz). Kutu yalnızca sunucu yine de 'bekle' derse (geçiş anı) gösterilir; yerel kayıt/engel yok ----
+    var BEKLEME_KEY = 'tiklama_bekleme_v1';
+    try { localStorage.removeItem(BEKLEME_KEY); localStorage.removeItem(BEKLEME_KEY + '_son'); } catch (e) {} // eski istemcinin yerel 5/10 dk kaydı silinir
+    var BEKLEME_MUAF = ['test', 'test2', 'vercel test', 'son test', 'hra oto'];
+    var bekleTimer = null;
+    function bekleMuaf_(name) { return BEKLEME_MUAF.indexOf(String(name || '').trim().toLowerCase()) >= 0; }
+    function bekleTelKey_(phone) { var d = String(phone || '').replace(/\D/g, ''); return /^05\d{9}$/.test(d) ? d : ''; }
+    function bekleOku_() { try { return JSON.parse(localStorage.getItem(BEKLEME_KEY) || '{}') || {}; } catch (e) { return {}; } }
+    function bekleYaz_(phone, untilMs) {
+      var k = bekleTelKey_(phone); if (!k) return;
+      try {
+        var o = bekleOku_(), now = Date.now();
+        Object.keys(o).forEach(function (x) { if (!(o[x] > now)) delete o[x]; });
+        o[k] = Math.max(o[k] || 0, untilMs);
+        localStorage.setItem(BEKLEME_KEY, JSON.stringify(o));
+        localStorage.setItem(BEKLEME_KEY + '_son', k);
+      } catch (e) {}
+    }
+    function bekleKalanMs_(phone) { var k = bekleTelKey_(phone); var u = k ? +bekleOku_()[k] || 0 : 0; return Math.max(0, u - Date.now()); }
+    function bekleSure_(ms) {
+      var sn = Math.max(1, Math.ceil(ms / 1000)), dk = Math.floor(sn / 60), s = sn % 60;
+      return dk ? (dk + ' dk' + (s ? ' ' + s + ' sn' : '')) : (s + ' sn');
+    }
+    function bekleGizle_() {
+      if (bekleTimer) { clearInterval(bekleTimer); bekleTimer = null; }
+      var b = $('bekle-box'); if (b) b.classList.remove('show', 'done');
+    }
+    function bekleGoster_(untilMs) {
+      var box = $('bekle-box'), txt = $('bekle-text'), ttl = $('bekle-title');
+      if (!box) return;
+      if (bekleTimer) clearInterval(bekleTimer);
+      function tick() {
+        var kalan = untilMs - Date.now();
+        if (kalan <= 0) {
+          clearInterval(bekleTimer); bekleTimer = null;
+          box.classList.add('done');
+          ttl.textContent = '✅ Bekleme bitti';
+          txt.textContent = 'Artık yeni tura başlayabilirsin.';
+          return;
+        }
+        box.classList.remove('done');
+        ttl.textContent = '⏳ Biraz sonra tekrar dene';
+        txt.innerHTML = 'Yeni tura <b>' + bekleSure_(kalan) + '</b> sonra başlayabilirsin.';
+      }
+      box.classList.add('show');
+      tick();
+      bekleTimer = setInterval(tick, 1000);
+    }
+
+    function startFlow() {
+      var name = $('name').value.trim();
+      var phone = $('phone').value.trim();
+      var ok = true;
+      if (!name) {
+        $('name').classList.add('invalid');
+        $('name-err').classList.add('show');
+        ok = false;
+      }
+      if (!isValidTRMobile(phone)) {
+        $('phone').classList.add('invalid');
+        $('phone-err').classList.add('show');
+        ok = false;
+      }
+      if (!ok) return;
+
+      bekleGizle_();
+
+      var btn = $('btn-start');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      var phoneText = phoneForSheet(phone);
+      // Her Başla = yepyeni tur: kayıtlı/eski tur silinir, linkler sunucudan taze alınır
+      clearLocal();
+      state.sessionId = null; state.sessionDone = false; state.step = 0;
+      var linkHazir = new Promise(function (r) { taptazeLinkler_(r); });
+      // IP/konum en fazla ~1.5 sn beklenir; gelmezse boş gönderilir (akış asla takılmaz)
+      var ipHazir = Promise.race([veriIpBaslat_(), new Promise(function (r) { setTimeout(r, 1500); })]).catch(function () {});
+      Promise.all([ipHazir, linkHazir]).then(function () {
+      runServer('startSession', [name, phoneText, veriMeta_()], function (sessionId) {
+        VERI.formBasAt = null;
+        applyNewSession_(sessionId, name, phoneText);
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        beginStep(0);
+      }, function (err) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        var msg = (err && err.message) ? String(err.message) : '';
+        if (err && err.bekle) {
+          bekleGoster_(Date.now() + err.kalanSn * 1000);
+        } else if (/Kilitleme|kilit|timeout|zaman aşı/i.test(msg)) {
+          toast('Sunucu meşgul. Lütfen birkaç saniye sonra tekrar Başla’ya basın.');
+        } else {
+          toast('Kayıt başlatılamadı. İnternetinizi kontrol edip tekrar deneyin.');
+        }
+        console.error(err);
+      });
+      });
+    }
+
+    // ---- steps ----
+    function renderDots() {
+      var html = '';
+      for (var i = 0; i < LINKS.length; i++) {
+        var cls = 'dot';
+        if (state.statuses[i] === 'done') cls += ' done';
+        else if (i === state.step) cls += ' current';
+        html += '<div class="' + cls + '"></div>';
+      }
+      $('dots').innerHTML = html;
+    }
+
+    function beginStep(index) {
+      if (index >= LINKS.length) {
+        completeAll();
+        return;
+      }
+      stopWaitTicker();
+      state.step = index;
+      state.clicked = false;
+      state.tapAt = null;
+      state.awaitingReturn = false;
+      state.logPending = false;
+      state.logFailed = false;
+      state.checking = false;
+      state.linkGateUntil = null;
+      state.modalOpen = false;
+      $('modal').classList.remove('show');
+      $('timer-wrap').classList.remove('visible');
+      $('step-badge').textContent = 'Adım ' + (index + 1) + ' / ' + LINKS.length;
+      $('btn-open-link').disabled = false;
+      $('btn-open-link').textContent = 'Linki Aç →';
+      resetClosedButton();
+      renderDots();
+      showScreen('screen-step');
+      saveLocal();
+      refreshLinksInBackground(true);
+    }
+
+    function resetClosedButton() {
+      var btn = $('btn-closed');
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      var label = btn.querySelector('.btn-label');
+      if (label) label.textContent = 'Kapattım';
+      else btn.textContent = 'Kapattım';
+    }
+
+    function startWaitTicker() {
+      stopWaitTicker();
+      updateWaitUI();
+      state.timerId = setInterval(function () {
+        updateWaitUI();
+      }, 250);
+    }
+
+    function stopWaitTicker() {
+      if (state.timerId) {
+        clearInterval(state.timerId);
+        state.timerId = null;
+      }
+    }
+
+    function updateWaitUI() {
+      var wrap = $('timer-wrap');
+      var bar = $('progress-bar');
+      var btn = $('btn-closed');
+      var openBtn = $('btn-open-link');
+      var rem;
+      var done;
+
+      // Between-link gate (after Kapattım success, before next link is allowed)
+      if (WAIT_MS > 0 && state.linkGateUntil && !state.clicked && !state.modalOpen) {
+        var gateRem = Math.max(0, state.linkGateUntil - Date.now());
+        rem = Math.ceil(gateRem / 1000);
+        done = gateRem <= 0;
+        wrap.classList.add('visible');
+        if (done) {
+          state.linkGateUntil = null;
+          openBtn.disabled = false;
+          wrap.classList.remove('visible');
+          $('timer-text').textContent = 'Hazır';
+          $('timer-label').textContent = 'Sonraki linke geçebilirsiniz';
+          bar.style.width = '100%';
+          bar.classList.remove('warn', 'danger');
+        } else {
+          openBtn.disabled = true;
+          $('timer-text').textContent = rem + 's';
+          $('timer-label').textContent = 'Sonraki link için bekleyin';
+          var gatePct = Math.max(0, Math.min(100, ((WAIT_MS - gateRem) / WAIT_MS) * 100));
+          bar.style.width = gatePct + '%';
+          bar.classList.remove('warn', 'danger');
+          if (rem <= 5) bar.classList.add('danger');
+          else if (rem <= 10) bar.classList.add('warn');
+        }
+      } else if (WAIT_MS > 0 && state.clicked && state.tapAt) {
+        rem = remainingSec();
+        done = waitDone();
+        wrap.classList.add('visible');
+        if (done) {
+          $('timer-text').textContent = 'Hazır';
+          $('timer-label').textContent = 'Sonraki linke geçebilirsiniz';
+          bar.style.width = '100%';
+          bar.classList.remove('warn', 'danger');
+        } else {
+          $('timer-text').textContent = rem + 's';
+          $('timer-label').textContent = 'Sonraki link için bekleyin';
+          var pct = Math.max(0, Math.min(100, ((WAIT_MS - remainingMs()) / WAIT_MS) * 100));
+          bar.style.width = pct + '%';
+          bar.classList.remove('warn', 'danger');
+          if (rem <= 5) bar.classList.add('danger');
+          else if (rem <= 10) bar.classList.add('warn');
+        }
+      } else {
+        wrap.classList.remove('visible');
+      }
+
+      if (state.modalOpen) {
+        var label = btn.querySelector('.btn-label');
+        function setLabel(t) {
+          if (label) label.textContent = t;
+          else btn.textContent = t;
+        }
+        // No sheet check on Kapattım — just close & advance.
+        btn.disabled = !!state.checking;
+        btn.classList.remove('loading');
+        setLabel('Kapattım');
+      }
+
+      // × unused (no verify failure path); keep hidden.
+      updateModalCloseBtn();
+    }
+    /** × hidden — verification removed; kept for markup compatibility. */
+    function updateModalCloseBtn() {
+      var btn = $('btn-modal-close');
+      if (!btn) return;
+      btn.classList.remove('show');
+      btn.setAttribute('aria-hidden', 'true');
+    }
+
+    function markConfirmed(stepIdx) {
+      state.confirmed[stepIdx] = true;
+      state.logPending = false;
+      state.logFailed = false;
+      saveLocal();
+      updateWaitUI();
+    }
+
+    /** Fire-and-forget click log (silent retries). Does not block Kapattım. */
+    function logClickWithRetry(stepIdx, attempt) {
+      attempt = attempt || 0;
+      state.logPending = true;
+      state.logFailed = false;
+      // Best-effort beacon so a backgrounded tab still delivers the write.
+      beaconPost({
+        action: 'click',
+        sessionId: state.sessionId,
+        linkIndex: stepIdx + 1,
+        clicked: true,
+        davranis: davranisOzet_()
+      });
+      runServer('logClick', [state.sessionId, stepIdx + 1, true], function () {
+        markConfirmed(stepIdx);
+      }, function () {
+        if (attempt < 2) {
+          setTimeout(function () {
+            logClickWithRetry(stepIdx, attempt + 1);
+          }, 600 * Math.pow(2, attempt));
+        } else {
+          state.logPending = false;
+          // Silent fail — Kapattım no longer depends on sheet verify.
+          saveLocal();
+        }
+      });
+    }
+
+    function showThanksScreen() {
+      stopWaitTicker();
+      state.sessionDone = true;
+      state.awaitingReturn = false;
+      state.modalOpen = false;
+      $('modal').classList.remove('show');
+      clearLocal();
+      // Her katılımda bilgiler yeniden girilir: tur bitince kimlik bellekte/formda tutulmaz
+      state.name = ''; state.phone = '';
+      $('name').value = ''; $('phone').value = '';
+      showScreen('screen-thanks');
+      // Tur sayacı / seans uyarısı yok; yalnızca sabit 4 tur bilgisi
+      try { turStatik(); } catch (e) {}
+    }
+
+    // ---- Trendyol uygulamasını doğrudan aç (Android intent; uygulama yoksa tarayıcı) ----
+    var TRENDYOL_PKG = 'trendyol.com'; // Google Play: play.google.com/store/apps/details?id=trendyol.com
+    function isAndroidIntentOk_() {
+      var ua = navigator.userAgent || '';
+      if (!/Android/i.test(ua) || /iPhone|iPad|iPod/i.test(ua)) return false;
+      if (/; wv\)/.test(ua) || /FBAN|FBAV|Instagram|Line\//i.test(ua)) return false; // uygulama içi tarayıcılar
+      return /Chrome\/\d+/.test(ua) && !/Firefox/i.test(ua);
+    }
+    function trendyolIntentUrl_(url) {
+      var m = /^https?:\/\/(.+)$/i.exec(String(url || '').split('#')[0]);
+      if (!m) return null;
+      return 'intent://' + m[1] + '#Intent;scheme=https;package=' + TRENDYOL_PKG +
+        ';S.browser_fallback_url=' + encodeURIComponent(url) + ';end';
+    }
+    var tkNavigate = function (u) { window.location.href = u; };
+    function openStepLink_(url) {
+      var intent = isAndroidIntentOk_() ? trendyolIntentUrl_(url) : null;
+      if (intent) {
+        // Aynı dokunuş içinde: uygulama yoksa browser_fallback_url normal linki açar
+        try { tkNavigate(intent); return; } catch (e) {}
+      }
+      try {
+        var w = window.open(url, '_blank');
+        if (w === null) tkNavigate(url);
+      } catch (e) {
+        tkNavigate(url);
+      }
+    }
+    function onLinkTap() {
+      var url = LINKS[state.step];
+      var isLast = state.step >= LINKS.length - 1;
+      var firstTap = !state.clicked;
+      var needRelog = state.clicked && !state.confirmed[state.step] && (state.logFailed || !state.logPending);
+
+      if (firstTap) {
+        state.clicked = true;
+        state.statuses[state.step] = 'done';
+        if (!isLast) davranisDokunus_(state.step);
+
+        if (isLast) {
+          // Last step: click+finish immediately; no wait / Kapattım
+          state.tapAt = null;
+          state.awaitingReturn = false;
+          state.sessionDone = true;
+          state.logPending = true;
+          var payload = {
+            action: 'clickfinish',
+            sessionId: state.sessionId,
+            linkIndex: state.step + 1,
+            clicked: true,
+            davranis: davranisOzet_()
+          };
+          beaconPost(payload);
+          // Also normal fetch when possible
+          runServer('clickAndFinish', [state.sessionId, state.step + 1, true], function () {
+            markConfirmed(state.step);
+            showThanksScreen();
+          }, function () {
+            // Beacon may still succeed; show thanks anyway
+            showThanksScreen();
+          });
+          saveLocal();
+        } else {
+          state.tapAt = Date.now();
+          state.awaitingReturn = true;
+          logClickWithRetry(state.step, 0);
+          saveLocal();
+          startWaitTicker();
+        }
+      } else if (needRelog && !isLast) {
+        // Re-send log without resetting the 30s timer
+        logClickWithRetry(state.step, 0);
+      }
+      // Re-tap otherwise: reopen link, keep timer
+
+      openStepLink_(url);
+
+      if (isLast) {
+        setTimeout(function () {
+          if (!document.hidden) showThanksScreen();
+        }, 700);
+      } else {
+        // Re-arm so returning after a re-tap (incl. after × dismiss) shows the modal again.
+        state.awaitingReturn = true;
+        setTimeout(function () {
+          if (state.awaitingReturn && !state.modalOpen) {
+            if (!document.hidden) showCloseModal();
+          }
+        }, 600);
+      }
+    }
+
+    function showCloseModal() {
+      if (state.sessionDone) {
+        showThanksScreen();
+        return;
+      }
+      if (state.modalOpen) return;
+      state.modalOpen = true;
+      $('modal').classList.add('show');
+      // Fresh open: never show × until a failed click-record state.
+      var x = $('btn-modal-close');
+      if (x) x.classList.remove('show');
+      updateWaitUI();
+    }
+
+    /** × unused (verification removed); safe no-op if still wired. */
+    function dismissCloseModal() {
+      updateModalCloseBtn();
+    }
+
+    /** Close modal and go to next step; keep 30s gate if still running. */
+    function advanceAfterConfirm(stepIdx) {
+      state.checking = false;
+      markConfirmed(stepIdx);
+      var gateUntil = state.tapAt ? (state.tapAt + WAIT_MS) : null;
+      if (gateUntil && Date.now() >= gateUntil) gateUntil = null;
+      $('modal').classList.remove('show');
+      state.modalOpen = false;
+      state.awaitingReturn = false;
+      stopWaitTicker();
+      beginStep(stepIdx + 1);
+      if (gateUntil) {
+        state.linkGateUntil = gateUntil;
+        saveLocal(); // yenilemede kapı (kalan süre) korunsun
+        startWaitTicker();
+        updateWaitUI();
+      }
+    }
+
+    /** Kapattım: no sheet check — close modal and advance (30s gate preserved). */
+    function onClosedConfirm() {
+      if (state.checking) return;
+      if (state.sessionDone) return;
+      if (!state.modalOpen) return;
+      var stepIdx = state.step;
+      state.checking = true; // debounce double-tap
+      davranisKapat_(stepIdx);
+      advanceAfterConfirm(stepIdx);
+    }
+
+        function onVisibilityOrFocus() {
+      davranisGorunurluk_();
+      if (!document.hidden && roundActive_()) refreshLinksInBackground(true);
+      if (state.sessionDone) {
+        if (!document.hidden) showThanksScreen();
+        return;
+      }
+      if (state.awaitingReturn && state.clicked && !state.modalOpen) {
+        if (!document.hidden) showCloseModal();
+      }
+      if (state.clicked && state.tapAt) {
+        updateWaitUI();
+      }
+    }
+
+    function completeAll() {
+      stopWaitTicker();
+      if (state.sessionId && !state.sessionDone) {
+        runServer('finish', [state.sessionId]);
+      }
+      showThanksScreen();
+    }
+
+    function resumeIfPossible() {
+      var saved = loadLocal();
+      if (!saved || !saved.sessionId) return false;
+      // Keep the same link list the session started with
+      if (saved.links && saved.links.length) {
+        applyLinks(saved.links);
+      }
+      state.sessionId = saved.sessionId;
+      state.name = saved.name || '';
+      state.phone = saved.phone || '';
+      state.step = Math.min(saved.step || 0, LINKS.length);
+      state.statuses = saved.statuses || LINKS.map(function () { return 'pending'; });
+      state.clicked = !!saved.clicked;
+      state.confirmed = saved.confirmed || LINKS.map(function () { return false; });
+      while (state.confirmed.length < LINKS.length) state.confirmed.push(false);
+      state.tapAt = saved.tapAt || null;
+      state.awaitingReturn = !!saved.awaitingReturn;
+      // Yenileme sayacı bitirmesin: dokunuş zamanı geçersizse (yok / gelecekte) linke yeniden dokunmak gerekir
+      var nowMs = Date.now();
+      var tapOk = typeof state.tapAt === 'number' && isFinite(state.tapAt) && state.tapAt <= nowMs + 5000;
+      if (state.clicked && !tapOk && !saved.sessionDone && (saved.step || 0) < LINKS.length - 1) {
+        state.clicked = false;
+        state.tapAt = null;
+        state.awaitingReturn = false;
+        if (state.statuses) state.statuses[Math.min(saved.step || 0, LINKS.length)] = 'pending';
+      }
+      if (!state.clicked) state.tapAt = null;
+      // Adımlar arası 30 sn kapısı: kalan süre = kayıtlı bitiş - şimdi (en fazla 30 sn)
+      var g = saved.linkGateUntil;
+      state.linkGateUntil = (WAIT_MS > 0 && !state.clicked && typeof g === 'number' && isFinite(g) && g > nowMs)
+        ? Math.min(g, nowMs + WAIT_MS) : null;
+      state.sessionDone = !!saved.sessionDone;
+      state.dv = (saved.dv && saved.dv.s && saved.dv.bg) ? saved.dv : { s: {}, bg: {} };
+      state.logPending = false;
+      state.logFailed = state.clicked && !state.confirmed[state.step];
+
+      if (state.sessionDone || state.step >= LINKS.length) {
+        showThanksScreen();
+        return true;
+      }
+
+      // Restore step UI without wiping tapAt
+      state.modalOpen = false;
+      $('modal').classList.remove('show');
+      $('step-badge').textContent = 'Adım ' + (state.step + 1) + ' / ' + LINKS.length;
+      $('btn-open-link').disabled = false;
+      $('btn-open-link').textContent = 'Linki Aç →';
+      resetClosedButton();
+      renderDots();
+      showScreen('screen-step');
+
+      // Kaydedilmiş linklerle devam et, ama Linkler sekmesindeki güncel hali de arka planda çek
+      refreshLinksInBackground(true);
+
+      if (state.linkGateUntil) {
+        $('btn-open-link').disabled = true;
+        startWaitTicker();
+      } else if (state.clicked && state.tapAt) {
+        startWaitTicker();
+        // If they already tapped and are returning / reloading mid-wait, show modal
+        if (state.awaitingReturn || !waitDone()) {
+          showCloseModal();
+        } else if (state.awaitingReturn) {
+          showCloseModal();
+        }
+      }
+      return true;
+    }
+
+    // ---- teşekkür ekranı: tur ilerlemesi + "N. tura başla" ----
+    var TUR_MIN = 4;
+    var SEANS_SAATLERI = [['09:58','12:00'],['12:18','14:00'],['14:18','16:00'],['16:18','18:00'],['18:18','20:00'],['20:18','22:00'],['22:18','24:00']];
+    var turKontrolId = null;
+    function istParts(d) {
+      var o = {};
+      new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Istanbul', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        .formatToParts(d || new Date()).forEach(function (p) { o[p.type] = p.value; });
+      return { gun: { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 }[o.weekday], dk: (+o.hour) * 60 + (+o.minute) };
+    }
+    function hmDk(hm) { var p = hm.split(':'); return (+p[0]) * 60 + (+p[1]); }
+    /** Sonraki seans başlangıcı: "Bugün 12:18 (Seans 2)" gibi. */
+    function sonrakiSeansText() {
+      var n = istParts(), gunAd = ['', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+      for (var d = 0; d < 8; d++) {
+        var g = ((n.gun - 1 + d) % 7) + 1;
+        if (g === 7) continue;
+        for (var i = 0; i < SEANS_SAATLERI.length; i++) {
+          if (d > 0 || hmDk(SEANS_SAATLERI[i][0]) > n.dk) {
+            return (d === 0 ? 'Bugün' : d === 1 ? 'Yarın' : gunAd[g]) + ' ' + SEANS_SAATLERI[i][0] + ' (Seans ' + (i + 1) + ')';
+          }
+        }
+      }
+      return '';
+    }
+    function turBox(cls, lbl, msg, sub, sayi) {
+      var b = $('tur-box'); b.className = 'tur-box ' + cls; b.innerHTML = '';
+      if (lbl) { var l = document.createElement('div'); l.className = 'tur-lbl'; l.textContent = lbl; b.appendChild(l); }
+      var m = document.createElement('div'); m.className = 'tur-msg'; m.textContent = msg; b.appendChild(m);
+      if (sayi != null) {
+        var st = document.createElement('div'); st.className = 'tur-steps';
+        for (var i = 0; i < TUR_MIN; i++) { var x = document.createElement('i'); if (i < sayi) x.className = 'on'; st.appendChild(x); }
+        b.appendChild(st);
+      }
+      if (sub) { var s2 = document.createElement('div'); s2.className = 'tur-sub'; s2.textContent = sub; b.appendChild(s2); }
+    }
+    function turLoading() {
+      var b = $('tur-box'); b.className = 'tur-box'; b.innerHTML = '';
+      var d = document.createElement('div'); d.className = 'tur-loading';
+      var sp = document.createElement('span'); sp.className = 'spinner';
+      var t = document.createElement('span'); t.textContent = 'Seans durumun kontrol ediliyor…';
+      d.appendChild(sp); d.appendChild(t); b.appendChild(d);
+    }
+    function turStatik() {
+      turBox('none', '', 'Çekiliş listesine girmek için bir seansta 12 linkin tamamını en az 4 kez (4 tur) bitirmelisin.', '', null);
+    }
+    function setNextRoundLabel(n) {
+      var l = $('btn-next-round').querySelector('.btn-label');
+      l.textContent = n ? n + '. tura başla' : 'Yeni tura başla';
+    }
+    function turKontrolFetch(phone) {
+      return fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'seansKontrol', telefon: phone, taze: true }),
+        redirect: 'follow'
+      }).then(function (res) { return res.text(); }).then(function (t) {
+        var d = JSON.parse(t);
+        if (!d || d.ok !== true || !d.result) throw new Error('api');
+        return d.result;
+      });
+    }
+    function turGoster(r) {
+      var a = r && r.kayitVar ? r.aktif : null;
+      if (a) {
+        var sayi = a.sayi || 0;
+        setNextRoundLabel(sayi + 1);
+        var lbl = 'Seans ' + a.seans + ' · ' + a.aralik;
+        if (sayi >= TUR_MIN) {
+          turBox('ok', lbl, '✅ ' + sayi + ' turu tamamladın, Seans ' + a.seans + ' çekiliş listesindesin!',
+            (!SIRALAMA_GOSTER ? '' : SIRALAMA_HAFTALIK_GOSTER ? 'Daha fazla tur, haftalık ve aylık sıralamada yükselmeni sağlar.' : 'Daha fazla tur, aylık sıralamada yükselmeni sağlar.'), TUR_MIN);
+        } else {
+          turBox('wait', lbl, 'Bu seansta ' + sayi + '/' + TUR_MIN + ' tur tamamladın — listeye girmek için ' + (TUR_MIN - sayi) + ' tur daha',
+            'Her tur = 12 linkin tamamı. Seans bitmeden ' + TUR_MIN + ' tura ulaşmalısın.', sayi);
+        }
+        return;
+      }
+      setNextRoundLabel(null);
+      var sub = 'Turlar yalnızca seans saatlerinde (Pazartesi–Cumartesi) sayılır.';
+      var nx = sonrakiSeansText();
+      if (nx) sub += ' Sonraki seans: ' + nx + '.';
+      var msg = 'Şu an aktif bir seans yok.';
+      var s2 = r && r.kayitVar ? r.son : null;
+      if (s2) {
+        msg += ' Son seansta (Seans ' + s2.seans + ', ' + s2.tarih + ') ' + s2.sayi + '/' + TUR_MIN + ' tur tamamladın' +
+          (s2.listede ? ' ✅ çekiliş listesindesin.' : '.');
+      }
+      turBox('off', 'Seans dışı', msg, sub, null);
+    }
+    function turIlerlemeBaslat() {
+      var phone = state.phone || phoneForSheet($('phone').value);
+      if (turKontrolId && turKontrolId === state.sessionId) return; // aynı tur için tekrar sorma
+      turKontrolId = state.sessionId || ('x' + Date.now());
+      var myId = turKontrolId;
+      setNextRoundLabel(null);
+      if (!isValidTRMobile(formatPhoneInput(phone))) { turStatik(); return; }
+      turLoading();
+      function fail() { if (myId === turKontrolId) turStatik(); }
+      setTimeout(function () {
+        turKontrolFetch(phone).then(function (r) {
+          if (myId !== turKontrolId) return;
+          var a = r.kayitVar ? r.aktif : null;
+          if (r.kayitVar) turGoster(r);
+          if (a && a.listede) return;
+          // Son tur tabloya geç düşmüş olabilir: ~3 sn sonra bir kez daha (önbelleksiz) sor, değiştiyse güncelle
+          setTimeout(function () {
+            turKontrolFetch(phone).then(function (r2) {
+              if (myId !== turKontrolId) return;
+              if (r2.kayitVar) turGoster(r2);
+              else if (!r.kayitVar) turStatik();
+            }).catch(function () { if (myId === turKontrolId && !r.kayitVar) turStatik(); });
+          }, 3000);
+        }).catch(fail);
+      }, 1500);
+    }
+    function startNextRound() {
+      var name = (state.name || $('name').value || '').trim();
+      var phone = state.phone || phoneForSheet($('phone').value);
+      if (!name || !isValidTRMobile(formatPhoneInput(phone))) {
+        // Bilgi yoksa giriş ekranına dön
+        $('btn-restart').click();
+        return;
+      }
+      var btn = $('btn-next-round');
+      if (btn.disabled) return;
+      btn.disabled = true; btn.classList.add('loading');
+      clearLocal();
+      state.sessionId = null;
+      taptazeLinkler_(function () {
+      runServer('startSession', [name, phone], function (sessionId) {
+        turKontrolId = null;
+        applyNewSession_(sessionId, name, phone);
+        btn.disabled = false; btn.classList.remove('loading');
+        beginStep(0);
+      }, function (err) {
+        btn.disabled = false; btn.classList.remove('loading');
+        var msg = (err && err.message) ? String(err.message) : '';
+        if (err && err.bekle) {
+          toast('Biraz sonra tekrar dene. Yeni tura ' + bekleSure_(err.kalanSn * 1000) + ' sonra başlayabilirsin.');
+        } else if (/Kilitleme|kilit|timeout|zaman aşı/i.test(msg)) {
+          toast('Sunucu meşgul. Lütfen birkaç saniye sonra tekrar deneyin.');
+        } else {
+          toast('Yeni tur başlatılamadı. İnternetinizi kontrol edip tekrar deneyin.');
+        }
+        console.error(err);
+      });
+      });
+    }
+
+    // ---- seansımı kontrol et (salt okunur) ----
+    var LAST_PHONE_KEY = 'tiklama_last_phone';
+    function kBox(cls, lbl, msg, bar) {
+      var d = document.createElement('div'); d.className = 'k-box ' + cls;
+      if (lbl) { var l = document.createElement('div'); l.className = 'k-lbl'; l.textContent = lbl; d.appendChild(l); }
+      var m = document.createElement('div'); m.className = 'k-msg'; m.textContent = msg; d.appendChild(m);
+      if (bar != null) {
+        var b = document.createElement('div'); b.className = 'k-bar';
+        var i = document.createElement('i'); i.style.width = Math.min(100, Math.round(bar * 100)) + '%';
+        b.appendChild(i); d.appendChild(b);
+      }
+      return d;
+    }
+    function renderKontrol(r) {
+      var box = $('k-result'); box.innerHTML = '';
+      if (!r || !r.kayitVar) {
+        box.appendChild(kBox('none', '', '🔎 Bu numarayla kayıt bulunamadı. Son seanslarda bu numarayla bir katılım görünmüyor.'));
+        return;
+      }
+      if (r.isim) { var h = document.createElement('div'); h.className = 'k-hello'; h.textContent = 'Merhaba ' + r.isim + ' 👋'; box.appendChild(h); }
+      var min = r.minimum || 4;
+      var a = r.aktif;
+      if (a) {
+        if (a.listede) {
+          box.appendChild(kBox('ok', 'Devam eden seans · bugün',
+            '✅ Seans ' + a.seans + ' (' + a.aralik + ') çekiliş listesindesin — 12 linki ' + a.sayi + ' kez tamamladın'));
+        } else {
+          box.appendChild(kBox('wait', 'Devam eden seans · ' + a.aralik,
+            '⏳ Seans ' + a.seans + ' devam ediyor: ' + a.sayi + '/' + min + ' tamamladın, ' + a.kalan + ' kez daha tamamlaman gerekiyor', a.sayi / min));
+        }
+      }
+      var s2 = r.son;
+      if (s2) {
+        var lbl = 'Son biten seans · ' + s2.tarih;
+        if (s2.listede) {
+          box.appendChild(kBox('ok', lbl, '✅ Seans ' + s2.seans + ' (' + s2.aralik + ') çekiliş listesindesin — 12 linki ' + s2.sayi + ' kez tamamladın'));
+        } else {
+          box.appendChild(kBox('no', lbl, '❌ Son seansta (Seans ' + s2.seans + ', ' + s2.aralik + ') ' + s2.sayi + '/' + min + ' tamamladın, listeye giremedin'));
+        }
+      }
+      if (r.simdi) { var t = document.createElement('div'); t.className = 'k-time'; t.textContent = 'Kontrol: ' + r.simdi; box.appendChild(t); }
+    }
+    function kSetLoading(on) {
+      var btn = $('btn-kontrol');
+      btn.disabled = on; btn.classList.toggle('loading', on);
+      btn.querySelector('.btn-label').textContent = on ? 'Bakılıyor…' : 'Kontrol et';
+    }
+    function kShowErr(msg) { var e = $('k-err'); e.textContent = msg; e.classList.toggle('show', !!msg); }
+    function doKontrol() {
+      var el = $('k-phone');
+      el.value = formatPhoneInput(el.value);
+      if (!isValidTRMobile(el.value)) {
+        el.classList.add('invalid');
+        kShowErr('Geçerli bir Türkiye cep numarası girin (05xx…).');
+        return;
+      }
+      kShowErr(''); $('k-result').innerHTML = ''; kSetLoading(true);
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'seansKontrol', telefon: phoneForSheet(el.value) }),
+        redirect: 'follow'
+      }).then(function (res) { return res.text(); }).then(function (text) {
+        var data = JSON.parse(text);
+        if (!data || data.ok !== true) {
+          var m = data && data.error ? String(data.error) : '';
+          throw new Error(/geçerli/i.test(m) ? m : 'x');
+        }
+        kSetLoading(false);
+        renderKontrol(data.result);
+      }).catch(function (err) {
+        kSetLoading(false);
+        var m = err && err.message && /geçerli/i.test(err.message) ? err.message : 'Şu an kontrol edilemedi. İnternetini kontrol edip birazdan tekrar dene.';
+        kShowErr(m);
+      });
+    }
+    function openKontrolSheet() {
+      var el = $('k-phone');
+      if (!isValidTRMobile(el.value) && isValidTRMobile($('phone').value)) el.value = formatPhoneInput($('phone').value);
+      $('kontrol-sheet').classList.add('show');
+      $('kontrol-sheet').setAttribute('aria-hidden', 'false');
+      document.body.classList.add('sheet-open');
+    }
+    function closeKontrolSheet() {
+      $('kontrol-sheet').classList.remove('show');
+      $('kontrol-sheet').setAttribute('aria-hidden', 'true');
+      if (!$('rank-sheet').classList.contains('show')) document.body.classList.remove('sheet-open');
+    }
+    function setupKontrol() {
+      var el = $('k-phone');
+      // Numara kayıttan otomatik doldurulmaz; eski kayıtlı numara da silinir.
+      try { localStorage.removeItem(LAST_PHONE_KEY); } catch (e) {}
+      el.addEventListener('input', function () {
+        el.value = formatPhoneInput(el.value);
+        el.classList.remove('invalid'); kShowErr('');
+      });
+      el.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') doKontrol(); });
+      $('btn-kontrol').addEventListener('click', doKontrol);
+      $('kontrol').addEventListener('click', openKontrolSheet);
+      $('btn-kontrol-x').addEventListener('click', closeKontrolSheet);
+      $('btn-kontrol-close').addEventListener('click', closeKontrolSheet);
+      $('kontrol-sheet').addEventListener('click', function (ev) { if (ev.target === $('kontrol-sheet')) closeKontrolSheet(); });
+      document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeKontrolSheet(); });
+      // Formdaki telefon girilince (kontrol kutusu boşsa) doldur — yalnızca bu sayfa görünümünde
+      $('phone').addEventListener('input', function () {
+        if (!el.value && isValidTRMobile($('phone').value)) el.value = formatPhoneInput($('phone').value);
+      });
+    }
+
+    // ---- sıralama (rank): salt okunur, hata olursa bölüm gizli kalır ----
+    var rankData = null, rankPeriod = SIRALAMA_HAFTALIK_GOSTER ? 'weekly' : 'monthly';
+    function rankRowEl(e) {
+      var li = document.createElement('li');
+      li.className = 'rank-row' + (e.sira <= 3 ? ' r' + e.sira : '');
+      var no = document.createElement('div'); no.className = 'rank-no'; no.textContent = e.sira;
+      var who = document.createElement('div'); who.className = 'rank-who';
+      var nm = document.createElement('div'); nm.className = 'rank-name'; nm.textContent = e.isim || '—';
+      var tl = document.createElement('div'); tl.className = 'rank-tel'; tl.textContent = e.tel || '';
+      who.appendChild(nm); who.appendChild(tl);
+      var c = document.createElement('div'); c.className = 'rank-cnt';
+      var st = document.createElement('strong'); st.textContent = e.toplam;
+      var sp = document.createElement('span'); sp.textContent = 'tamamlama';
+      c.appendChild(st); c.appendChild(sp);
+      li.appendChild(no); li.appendChild(who); li.appendChild(c);
+      return li;
+    }
+    function rankFill(ol, list) {
+      ol.innerHTML = '';
+      if (!list.length) {
+        var li = document.createElement('li'); li.className = 'rank-empty';
+        li.textContent = 'Bu dönemde henüz tamamlama yok.';
+        ol.appendChild(li); return;
+      }
+      list.forEach(function (e) { ol.appendChild(rankRowEl(e)); });
+    }
+    function renderRank() {
+      if (!rankData) return;
+      if (!SIRALAMA_HAFTALIK_GOSTER) rankPeriod = 'monthly';
+      var list = (rankPeriod === 'monthly' ? rankData.monthly : rankData.weekly) || [];
+      document.querySelectorAll('.seg button').forEach(function (b) {
+        b.classList.toggle('on', b.getAttribute('data-period') === rankPeriod);
+      });
+      rankFill($('rank-top'), list.slice(0, 5));
+      rankFill($('rank-all'), list.slice(0, 25));
+      $('btn-rank-all').style.display = list.length > 5 ? '' : 'none';
+      // v25d: sekmenin kendi damgası (haftalık / aylık ayrı); sıralama elle güncellenir
+      var updT = (rankPeriod === 'monthly' ? rankData.monthlyUpdated : rankData.weeklyUpdated) || rankData.updated || '';
+      var upd = updT ? 'Son güncelleme: ' + updT : '';
+      $('rank-upd').textContent = upd;
+      var donem = rankPeriod === 'monthly' ? rankData.monthlyDonem : rankData.weeklyDonem;
+      $('rank-sheet-sub').textContent = [donem, upd].filter(Boolean).join(' · ');
+      $('rank-sheet-title').textContent = '🏆 ' + (rankPeriod === 'monthly' ? 'Aylık' : 'Haftalık') + ' İlk 25';      if (SIRALAMA_AKTIF) { try { renderMyRank(); } catch (e) {} }
+    }
+    function openRankSheet() {
+      $('rank-sheet').classList.add('show');
+      $('rank-sheet').setAttribute('aria-hidden', 'false');
+      document.body.classList.add('sheet-open');
+    }
+    function closeRankSheet() {
+      $('rank-sheet').classList.remove('show');
+      $('rank-sheet').setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('sheet-open');
+    }
+    // v25d: sıralama sekmelerden (elle güncellenir) — kart görünürken 60 sn'de bir yenilenir; gizliyken istek yok.
+    var RANK_YENILE_MS = 60000;
+    var rankSonYukleme = 0, rankYukleniyor = false;
+    function rankGorunur_() {
+      var el = $('rank');
+      return document.visibilityState === 'visible' && !!el && el.classList.contains('show') && el.offsetParent !== null;
+    }
+    function rankYenileBaslat_() {
+      setInterval(function () {
+        if (rankGorunur_() && Date.now() - rankSonYukleme >= RANK_YENILE_MS - 500) loadRank();
+      }, 5000);
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible' && rankSonYukleme && Date.now() - rankSonYukleme >= RANK_YENILE_MS) loadRank();
+      });
+    }
+    function loadRank() {
+      if (!SIRALAMA_GOSTER) return;
+      if (rankYukleniyor) return;
+      rankYukleniyor = true; rankSonYukleme = Date.now();
+      try {
+        fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'rank' }),
+          redirect: 'follow'
+        }).then(function (res) { return res.json(); }).then(function (data) {
+          var r = data && data.ok === true ? data.result : null;
+          if (!SIRALAMA_HAFTALIK_GOSTER) {
+            // yalnız aylık liste kullanılır; haftalık veri yok sayılır
+            if (!r || !Array.isArray(r.monthly) || !r.monthly.length) return;
+            rankData = { monthly: r.monthly, monthlyUpdated: r.monthlyUpdated || '', monthlyDonem: r.monthlyDonem || '', updated: r.monthlyUpdated ? '' : (r.updated || '') };
+            rankPeriod = 'monthly';
+          } else {
+            if (!r || !Array.isArray(r.weekly) || !Array.isArray(r.monthly)) return;
+            if (!r.weekly.length && !r.monthly.length) return;
+            rankData = r;
+            if (!r.weekly.length) rankPeriod = 'monthly';
+          }
+          renderRank();
+          $('rank').classList.add('show');
+          if (SIRALAMA_AKTIF) { try { startMyRank(); } catch (e) {} }
+        }).catch(function () { /* sessizce gizli kalsın */ }).then(function () { rankYukleniyor = false; });
+      } catch (e) { rankYukleniyor = false; }
+    }
+    // ---- senin sıran (myRank): yalnızca elle girilen numaranın sırası, kayıt tutulmaz; hata olursa kutu gizlenir ----
+    var myRank = { data: null, phone: '', loading: false, started: false };
+    function myRankHide() { $('my-rank').hidden = true; }
+    function myRankAsk(msg) {
+      myRank.data = null;
+      $('my-rank').hidden = false;
+      $('my-rank-view').innerHTML = '';
+      $('my-rank-ask').hidden = false;
+      $('btn-my-rank-chg').hidden = true;
+      var err = $('my-rank-err'); err.textContent = msg || ''; err.classList.toggle('show', !!msg);
+    }
+    function renderMyRank() {
+      if (!myRank.data) return;
+      var d = myRank.data, aylik = rankPeriod === 'monthly';
+      var b = aylik ? d.aylik : d.haftalik;
+      var v = $('my-rank-view'); v.innerHTML = '';
+      $('my-rank-ask').hidden = true;
+      $('btn-my-rank-chg').hidden = false;
+      $('my-rank-lbl').textContent = 'Senin sıran · ' + (aylik ? 'Aylık' : 'Haftalık');
+      if (b && b.sira) {
+        var m = document.createElement('div'); m.className = 'my-rank-main';
+        var bb = document.createElement('b'); bb.textContent = b.sira + '.';
+        m.appendChild(bb);
+        m.appendChild(document.createTextNode(' / ' + b.toplam + ' kişi · ' + b.sayi + ' tur'));
+        v.appendChild(m);
+      } else {
+        var n = document.createElement('div'); n.className = 'my-rank-none';
+        n.textContent = aylik ? 'Bu ay henüz tamamlanmış turun yok.' : 'Bu hafta henüz tamamlanmış turun yok.';
+        v.appendChild(n);
+      }
+      var sub = document.createElement('div'); sub.className = 'my-rank-sub';
+      sub.textContent = [d.isim, d.telefon].filter(Boolean).join(' · ');
+      v.appendChild(sub);
+      $('my-rank').hidden = false;
+    }
+    function fetchMyRank(phone, manual) {
+      if (!SIRALAMA_AKTIF) { myRankHide(); return; }
+      if (myRank.loading) return;
+      myRank.loading = true; myRank.phone = phone;
+      $('my-rank').hidden = false;
+      $('my-rank-ask').hidden = !!manual ? false : true;
+      if (!manual) { $('my-rank-view').innerHTML = '<div class="my-rank-load">Sıran yükleniyor…</div>'; }
+      $('btn-my-rank').disabled = true;
+      var done = function () { myRank.loading = false; $('btn-my-rank').disabled = false; };
+      try {
+        fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'myRank', telefon: phoneForSheet(phone) }),
+          redirect: 'follow'
+        }).then(function (res) { return res.json(); }).then(function (data) {
+          done();
+          var r = data && data.ok === true ? data.result : null;
+          if (!r || typeof r !== 'object' || !('haftalik' in r)) {
+            // Bilinmeyen action (backend henüz yok) / beklenmeyen yanıt: sessizce gizle
+            if (manual && data && data.ok === false && /geçerli/i.test(String(data.error || ''))) { myRankAsk('Geçerli bir cep numarası girin (05xx xxx xx xx).'); return; }
+            myRankHide(); return;
+          }
+          myRank.data = r;
+          renderMyRank();
+        }).catch(function () { done(); myRankHide(); });
+      } catch (e) { done(); myRankHide(); }
+    }
+    function startMyRank() {
+      if (!SIRALAMA_AKTIF) { myRankHide(); return; }
+      if (myRank.started) return;
+      myRank.started = true;
+      var el = $('my-rank-phone');
+      el.addEventListener('input', function () {
+        el.value = formatPhoneInput(el.value);
+        el.classList.remove('invalid');
+        var err = $('my-rank-err'); err.textContent = ''; err.classList.remove('show');
+      });
+      var submit = function () {
+        var v = formatPhoneInput(el.value);
+        if (!isValidTRMobile(v)) { el.classList.add('invalid'); myRankAsk('Geçerli bir cep numarası girin (05xx xxx xx xx).'); return; }
+        fetchMyRank(v, true);
+      };
+      el.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') submit(); });
+      $('btn-my-rank').addEventListener('click', submit);
+      $('btn-my-rank-chg').addEventListener('click', function () {
+        el.value = ''; myRankAsk('');
+        try { el.focus(); } catch (e) {}
+      });
+      // Her açılışta boş numara alanı; sıra yalnızca elle sorgulanınca bu görünümde gösterilir.
+      myRankAsk('');
+    }
+    function setupRank() {
+      if (!SIRALAMA_GOSTER) {
+        // Sıralama tamamen kapalı: kart + İlk 25 penceresi gizli; istek ve yenileme zamanlayıcısı kurulmaz
+        ['rank', 'rank-sheet'].forEach(function (id) { var el = $(id); if (el) { el.hidden = true; el.style.display = 'none'; el.classList.remove('show'); } });
+        return;
+      }
+      if (!SIRALAMA_HAFTALIK_GOSTER) {
+        // Haftalık düğmelerini tamamen kaldır; tek seçenek kaldığı için seçici gizlenir
+        document.querySelectorAll('.seg button[data-period="weekly"]').forEach(function (b) { b.parentNode.removeChild(b); });
+        document.querySelectorAll('.seg').forEach(function (g) { g.style.display = 'none'; });
+        var rt = document.querySelector('#rank .rank-head .rank-title');
+        if (rt) rt.textContent = '🏆 En Çok Katılanlar · Aylık';
+      }
+      if (!SIRALAMA_AKTIF) { try { myRankHide(); } catch (e) {} }
+      document.querySelectorAll('.seg button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          rankPeriod = b.getAttribute('data-period');
+          renderRank();
+        });
+      });
+      $('btn-rank-all').addEventListener('click', openRankSheet);
+      $('btn-rank-x').addEventListener('click', closeRankSheet);
+      $('btn-rank-close').addEventListener('click', closeRankSheet);
+      $('rank-sheet').addEventListener('click', function (ev) { if (ev.target === $('rank-sheet')) closeRankSheet(); });
+      document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeRankSheet(); });
+      loadRank();
+      rankYenileBaslat_();
+    }
+
+    // ---- wire up ----
+    function init() {
+      try { setupRank(); } catch (e) {}
+      try { setupKontrol(); } catch (e) {}
+      $('btn-next-round').addEventListener('click', startNextRound);
+      setupEntry();
+      $('btn-open-link').addEventListener('click', onLinkTap);
+      $('btn-closed').addEventListener('click', onClosedConfirm);
+      $('btn-modal-close').addEventListener('click', dismissCloseModal);
+      function restartToEntry(askConfirm) {
+        if (askConfirm && !window.confirm('Baştan başlamak istediğinize emin misiniz?')) return;
+        clearLocal();
+        stopWaitTicker();
+        state = {
+          sessionId: null, name: '', phone: '', step: 0, clicked: false,
+          confirmed: [], statuses: [], tapAt: null, timerId: null,
+          awaitingReturn: false, modalOpen: false,
+          logPending: false, logFailed: false, checking: false, linkGateUntil: null, sessionDone: false
+        };
+        $('name').value = '';
+        $('phone').value = '';
+        VERI.formBasAt = null;
+        $('modal').classList.remove('show');
+        bekleGizle_();
+        showScreen('screen-entry');
+        loadLinksFromSheet();
+      }
+      $('btn-restart').addEventListener('click', function () { restartToEntry(false); });
+      $('btn-restart-step').addEventListener('click', function () { restartToEntry(true); });
+      document.addEventListener('visibilitychange', onVisibilityOrFocus);
+      window.addEventListener('focus', onVisibilityOrFocus);
+      window.addEventListener('pagehide', function () { try { davranisGorunurluk_(); } catch (e) {} });
+      try { veriBaslat_(); } catch (e) {}
+      startLinkRefreshLoop_();
+      if (resumeIfPossible()) {
+        // Mid-session resume: keep stored links, enable start for later restart
+        setStartReady(true);
+      } else {
+        // Every fresh load reads the sheet
+        loadLinksFromSheet();
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
